@@ -51,16 +51,16 @@ export class ProductManager {
   async getProducts() {
     try {
       let data = await utils.readFile(this.path);
-      return data?.length > 0 ? this.products : "aun no hay registros";
+      // Correccion
+      return data?.length > 0 ? data : [];
     } catch (error) {
       console.log(error);
     }
   }
   async getProductById(id) {
     try {
-      let data = await utils.readFile(this.path);
-      this.products = data?.length > 0 ? data : [];
-      let product = this.products.find((dato) => dato.id === id);
+      let data = await this.getProducts();
+      let product = data.find((dato) => dato.id === id);
 
       if (product !== undefined) {
         return product;
@@ -74,10 +74,9 @@ export class ProductManager {
 
   async updateProductById(id, data) {
     try {
-      let products = await utils.readFile(this.path);
-      this.products = products?.length > 0 ? products : [];
+      let products = await this.getProducts();
 
-      let productIndex = this.products.findIndex((dato) => dato.id === id);
+      let productIndex = products.findIndex((dato) => dato.id === id);
       if (productIndex !== -1) {
         this.products[productIndex] = {
           ...this.products[productIndex],
@@ -98,9 +97,9 @@ export class ProductManager {
 
   async deleteProductById(id) {
     try {
-      let products = await utils.readFile(this.path);
-      this.products = products?.length > 0 ? products : [];
-      let productIndex = this.products.findIndex((dato) => dato.id === id);
+      let products = await this.getProducts();
+
+      let productIndex = products.findIndex((dato) => dato.id === id);
       if (productIndex !== -1) {
         let product = this.products[productIndex];
         this.products.splice(productIndex, 1);
